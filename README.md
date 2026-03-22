@@ -17,66 +17,51 @@ The intent is to provide an OpenCode-friendly, shareable port of the official As
 
 ### For humans
 
-Prerequisites:
-
-- `opencode` is installed and available on your PATH.
-- `git` is installed.
-
-Quick start (recommended, session-scoped):
+1) Clone the repository:
 
 ```bash
-git clone https://github.com/IronCloud/opencode-astral-skills && OPENCODE_CONFIG_DIR="$PWD/opencode-astral-skills" opencode
+git clone https://github.com/IronCloud/opencode-astral-skills
 ```
 
-This keeps your shell profile unchanged and applies only to the current run.
+2) Run OpenCode with this config directory (recommended):
 
-Optional persistent setup:
+```bash
+OPENCODE_CONFIG_DIR="$PWD/opencode-astral-skills" opencode
+```
+
+This is session-scoped and does not change your shell profile.
+
+Optional (persistent setup):
 
 ```bash
 export OPENCODE_CONFIG_DIR=/absolute/path/to/opencode-astral-skills
 ```
 
-Verification:
+Then run:
 
 ```bash
-test -f "/absolute/path/to/opencode-astral-skills/skills/uv/SKILL.md"
-test -f "/absolute/path/to/opencode-astral-skills/skills/ruff/SKILL.md"
-test -f "/absolute/path/to/opencode-astral-skills/skills/ty/SKILL.md"
+opencode
 ```
 
-Troubleshooting:
+Verify skill files exist:
 
-- Ensure the path points to the repository root (the directory that contains `skills/`).
-- Ensure skill files are named exactly `SKILL.md`.
-- If using `export`, restart your shell or source your profile before launching OpenCode.
+```bash
+test -f "$PWD/opencode-astral-skills/skills/uv/SKILL.md"
+test -f "$PWD/opencode-astral-skills/skills/ruff/SKILL.md"
+test -f "$PWD/opencode-astral-skills/skills/ty/SKILL.md"
+```
 
 ### For LLM agents
 
-Use this machine-oriented install guide as the source of truth:
+Use `docs/INSTALL.md` as the canonical install guide.
 
 - `docs/INSTALL.md`
 
-Raw URL (recommended for agents):
+Raw URL:
 
 ```text
 https://raw.githubusercontent.com/IronCloud/opencode-astral-skills/main/docs/INSTALL.md
 ```
-
-## Quick start (shareable config dir)
-
-Use this repository as an OpenCode config directory via `OPENCODE_CONFIG_DIR`.
-
-```bash
-OPENCODE_CONFIG_DIR=/path/to/opencode-astral-skills opencode
-```
-
-Or export it in your shell profile:
-
-```bash
-export OPENCODE_CONFIG_DIR=/path/to/opencode-astral-skills
-```
-
-With this layout, OpenCode discovers skills at `skills/<name>/SKILL.md`.
 
 ## Alternative installation
 
