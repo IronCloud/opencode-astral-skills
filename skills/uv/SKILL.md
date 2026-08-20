@@ -56,7 +56,7 @@ uv init
 uv add requests
 uv remove requests
 uv sync
-uv sync --locked --all-extras --dev
+uv sync --locked --all-extras
 uv run <command>
 uv run python -c "print('ok')"
 uv run --python 3.12 <command>
@@ -95,7 +95,7 @@ uv pip list --outdated
 Use these patterns when installing into reproducible build environments.
 
 ```bash
-uv sync --locked --all-extras --dev
+uv sync --locked --all-extras
 uv pip install --system -r requirements.txt
 ```
 

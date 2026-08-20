@@ -1,0 +1,41 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.12.5"
+          enable-cache: true
+          cache-dependency-glob: "scripts/*.py"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - name: Install validation tools
+        run: npm install --global opencode-ai@1.18.18
+      - name: Validate skill definitions
+        run: uv run scripts/validate_skills.py
+      - name: Check validation code
+        run: |
+          uvx ruff@0.16.3 check scripts
+          uvx ruff@0.16.3 format --check scripts
+          uv run --with ty==0.0.73 --with PyYAML==6.0.2 ty check scripts
+      - name: Validate selected CLI guidance
+        run: python scripts/check_cli_compatibility.py
+      - name: Smoke-test OpenCode discovery
+        run: python scripts/smoke_opencode.py
