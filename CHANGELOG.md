@@ -18,6 +18,8 @@ and releases use [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Replaced the custom config-directory installation with native `skills.paths`
   and standard OpenCode skill directories.
 - Scoped Ruff mutation examples and added unsafe-fix previews.
+- Updated GitHub workflow actions to their current major releases and use the
+  official `astral-sh/setup-uv` action for pinned uv installation and caching.
 
 ### Fixed
 

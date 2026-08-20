@@ -13,6 +13,16 @@ EXPECTED_SKILLS = {"ruff", "ty", "uv"}
 
 
 def snapshot(root: Path) -> dict[str, bytes]:
+    """Capture every file below a directory for later mutation detection.
+
+    Args:
+        root (Path): Directory whose descendant files should be recorded.
+
+    Returns:
+        dict[str, bytes]: Mapping from each relative file path to its exact byte
+        content. Comparing two snapshots detects added, removed, or modified
+        files, including files ignored by Git.
+    """
     return {
         str(path.relative_to(root)): path.read_bytes()
         for path in sorted(root.rglob("*"))
@@ -21,6 +31,23 @@ def snapshot(root: Path) -> dict[str, bytes]:
 
 
 def main() -> int:
+    """Verify that OpenCode discovers all skills without changing their source.
+
+    A temporary copy of the skills is registered through inline OpenCode
+    configuration. The command output is parsed as JSON and each discovered
+    location is compared with the expected SKILL.md path. File snapshots ensure
+    discovery does not write into the configured skill source.
+
+    Args:
+        None.
+
+    Returns:
+        int: Process exit code. Returns 0 when all expected skills are discovered
+        at the correct paths without file mutations, otherwise returns a
+        non-zero command exit code or 1 for validation failures.
+    """
+    # Use a disposable copy so this test can detect all filesystem mutations
+    # without touching or relying on the state of the developer's checkout.
     with tempfile.TemporaryDirectory(prefix="opencode-astral-skills-") as directory:
         test_root = Path(directory)
         skill_root = test_root / "skills"
@@ -30,9 +57,12 @@ def main() -> int:
         env = os.environ.copy()
         env.update(
             {
+                # Inline configuration registers only this temporary skill path.
                 "OPENCODE_CONFIG_CONTENT": json.dumps(
                     {"skills": {"paths": [str(skill_root)]}}
                 ),
+                # External skill sources are disabled so same-named user skills
+                # cannot hide a failure in the repository copy being tested.
                 "OPENCODE_DISABLE_EXTERNAL_SKILLS": "1",
                 "OPENCODE_DISABLE_CLAUDE_CODE_SKILLS": "1",
             }
@@ -56,6 +86,8 @@ def main() -> int:
             print(f"error: opencode returned invalid JSON: {error}", file=sys.stderr)
             return 1
 
+        # Indexing by name makes the expected-skill checks direct and also
+        # mirrors how OpenCode resolves one active definition for each name.
         by_name = {item["name"]: item for item in discovered}
         errors = 0
         for name in sorted(EXPECTED_SKILLS):

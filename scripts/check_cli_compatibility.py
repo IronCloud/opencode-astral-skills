@@ -44,9 +44,25 @@ FORBIDDEN_GUIDANCE = {
 
 
 def main() -> int:
+    """Check selected documented options against the supported tool versions.
+
+    Each command's help output is inspected for options used by the skills. The
+    skill files are also scanned for known unsupported command examples so a
+    previously corrected mistake cannot be reintroduced unnoticed.
+
+    Args:
+        None.
+
+    Returns:
+        int: Process exit code. Returns 0 when every selected option is present
+        and no forbidden guidance is found, or 1 when any check fails.
+    """
     errors = 0
 
     for label, (command, expected) in CONTRACTS.items():
+        # Help commands are safe to execute because they inspect the CLI without
+        # modifying a Python project. Capture both output streams because some
+        # command-line programs print help or errors to standard error.
         result = subprocess.run(
             command, cwd=ROOT, text=True, capture_output=True, check=False
         )
@@ -61,6 +77,8 @@ def main() -> int:
                 print(f"error: {label} no longer documents {option}", file=sys.stderr)
                 errors += 1
 
+    # Combining the skill files allows each unsupported snippet to be checked
+    # once while still covering all three skills.
     skill_text = "\n".join(
         path.read_text(encoding="utf-8")
         for path in sorted((ROOT / "skills").glob("*/SKILL.md"))

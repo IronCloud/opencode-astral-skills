@@ -12,6 +12,20 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> int:
+    """Detect newer upstream commits for the tracked source skill paths.
+
+    The function reads `upstream.json`, asks the GitHub commits API for the most
+    recent commit touching each tracked path, and compares that result with the
+    last reviewed commit. It is a drift notification only; it does not claim
+    that local adaptations are identical to upstream.
+
+    Args:
+        None.
+
+    Returns:
+        int: Process exit code. Returns 0 when no tracked path has a newer
+        commit, or 1 when drift is found or the GitHub API cannot be queried.
+    """
     manifest = json.loads((ROOT / "upstream.json").read_text(encoding="utf-8"))
     repository = manifest["repository"]
     headers = {
@@ -23,6 +37,8 @@ def main() -> int:
 
     changed: list[str] = []
     for name, source in sorted(manifest["skills"].items()):
+        # GitHub's `path` filter returns only commits that modified this skill,
+        # avoiding false alerts from unrelated changes elsewhere upstream.
         query = urllib.parse.urlencode({"path": source["path"], "per_page": 1})
         url = f"https://api.github.com/repos/{repository}/commits?{query}"
         try:

@@ -19,10 +19,32 @@ NAME_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
 def fail(message: str) -> None:
+    """Print one validation error to standard error.
+
+    Args:
+        message (str): Human-readable explanation of the validation failure.
+
+    Returns:
+        None: This function only prints the message; it does not return a value
+        or stop validation.
+    """
     print(f"error: {message}", file=sys.stderr)
 
 
 def main() -> int:
+    """Validate every native OpenCode skill definition in the repository.
+
+    The validation covers the expected skill directories, YAML frontmatter,
+    OpenCode naming constraints, metadata types, license declarations, and the
+    presence of a non-empty instruction body.
+
+    Args:
+        None.
+
+    Returns:
+        int: Process exit code. Returns 0 when all skills are valid, or 1 when
+        one or more validation errors were found.
+    """
     errors = 0
     names: set[str] = set()
     files = sorted(SKILLS.glob("*/SKILL.md"))
@@ -33,6 +55,10 @@ def main() -> int:
 
     for path in files:
         text = path.read_text(encoding="utf-8")
+
+        # A SKILL.md starts and ends its YAML frontmatter with `---`. Limiting
+        # the split to two separators leaves any later Markdown horizontal
+        # rules untouched in the instruction body.
         parts = text.split("---", 2)
         if len(parts) != 3 or parts[0].strip():
             fail(f"{path.relative_to(ROOT)} must start with YAML frontmatter")
@@ -82,6 +108,8 @@ def main() -> int:
             fail(f"{path.relative_to(ROOT)} must declare the repository's MIT license")
             errors += 1
 
+        # OpenCode requires both metadata keys and values to be strings. Check
+        # the container first so malformed scalar or list values fail cleanly.
         if not isinstance(metadata, dict) or any(
             not isinstance(key, str) or not isinstance(value, str)
             for key, value in metadata.items()
