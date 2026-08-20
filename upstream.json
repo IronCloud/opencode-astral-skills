@@ -1,0 +1,17 @@
+{
+  "repository": "astral-sh/claude-code-plugins",
+  "skills": {
+    "ruff": {
+      "path": "plugins/astral/skills/ruff/SKILL.md",
+      "commit": "f3ce88a7ba830f53afd6d944c1d0278ed318e142"
+    },
+    "ty": {
+      "path": "plugins/astral/skills/ty/SKILL.md",
+      "commit": "f3ce88a7ba830f53afd6d944c1d0278ed318e142"
+    },
+    "uv": {
+      "path": "plugins/astral/skills/uv/SKILL.md",
+      "commit": "f3ce88a7ba830f53afd6d944c1d0278ed318e142"
+    }
+  }
+}

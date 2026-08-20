@@ -1,92 +1,87 @@
 # opencode-astral-skills
 
-Reusable OpenCode skills for Astral tooling: `uv`, `ruff`, and `ty`.
+Native OpenCode skills for Astral tooling: `uv`, `ruff`, and `ty`.
 
-This repo is intentionally skills-only. It does not ship model, permission, or plugin defaults, so teams can adopt it without changing existing OpenCode behavior.
-
-The intent is to provide an OpenCode-friendly, shareable port of the official Astral Claude plugin skills, with minimal ergonomic additions for installation and usage.
+The skills provide on-demand guidance without setting models, permissions, or
+other OpenCode defaults. OpenCode still merges skills from every configured
+source, so check for existing skills with the same names before installation.
 
 ## Contents
 
-- `skills/uv/SKILL.md`: guidance for using `uv` in Python projects and scripts.
-- `skills/ruff/SKILL.md`: guidance for linting and formatting Python code with Ruff.
-- `skills/ty/SKILL.md`: guidance for type checking Python code with ty.
-- `docs/INSTALL.md`: canonical installation and verification instructions.
+- `skills/uv/SKILL.md`: Python project, script, environment, and tool workflows.
+- `skills/ruff/SKILL.md`: focused Python linting and formatting workflows.
+- `skills/ty/SKILL.md`: Python type-checking workflows.
+- `docs/INSTALL.md`: canonical installation, update, and removal instructions.
+- `UPSTREAM.md`: reviewed source files and synchronization policy.
 
 ## Installation
 
-### For humans
-
-1) Clone the repository:
+Clone the repository to a stable location:
 
 ```bash
-git clone https://github.com/IronCloud/opencode-astral-skills
+git clone https://github.com/IronCloud/opencode-astral-skills \
+  "$HOME/.local/share/opencode-astral-skills"
 ```
 
-2) Run OpenCode with this config directory (recommended):
+Add its `skills` directory to your global `~/.config/opencode/opencode.json` or
+project `opencode.json`. Merge this with existing configuration rather than
+replacing other fields:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": {
+    "paths": ["~/.local/share/opencode-astral-skills/skills"]
+  }
+}
+```
+
+Restart OpenCode after changing configuration, then verify discovery:
 
 ```bash
-OPENCODE_CONFIG_DIR="$PWD/opencode-astral-skills" opencode
+opencode debug skill
 ```
 
-This is session-scoped and does not change your shell profile.
+Confirm `uv`, `ruff`, and `ty` each resolve to the cloned repository. See
+[`docs/INSTALL.md`](docs/INSTALL.md) for project-local copies, temporary use,
+updates, removal, collision handling, and agent-safe installation.
 
-Optional (persistent setup):
-
-```bash
-export OPENCODE_CONFIG_DIR=/absolute/path/to/opencode-astral-skills
-```
-
-Then run:
-
-```bash
-opencode
-```
-
-Verify skill files exist:
-
-```bash
-test -f "$PWD/opencode-astral-skills/skills/uv/SKILL.md"
-test -f "$PWD/opencode-astral-skills/skills/ruff/SKILL.md"
-test -f "$PWD/opencode-astral-skills/skills/ty/SKILL.md"
-```
-
-### For LLM agents
-
-Use `docs/INSTALL.md` as the canonical install guide.
-
-- `docs/INSTALL.md`
-
-Raw URL:
+Agent installers should follow the runbook in `docs/INSTALL.md`. After the user
+approves a full commit SHA, the immutable raw URL has this form:
 
 ```text
-https://raw.githubusercontent.com/IronCloud/opencode-astral-skills/main/docs/INSTALL.md
+https://raw.githubusercontent.com/IronCloud/opencode-astral-skills/<approved-full-commit>/docs/INSTALL.md
 ```
-
-## Alternative installation
-
-If you do not want to use `OPENCODE_CONFIG_DIR`, copy one or more skill folders to an OpenCode skill discovery path:
-
-- Project-local: `.opencode/skills/<name>/SKILL.md`
-- User-global: `~/.config/opencode/skills/<name>/SKILL.md`
 
 ## Usage
 
-The agent can load these skills on demand with the `skill` tool when tasks involve Python dependency management, linting/formatting, or type checking.
-
-You can also prompt explicitly, for example:
+OpenCode exposes each skill through its native `skill` tool and loads the full
+guidance on demand. You can also request them explicitly:
 
 ```text
-Use the uv, ruff, and ty skills and set up this Python project with Astral best practices.
+Use the uv, ruff, and ty skills to set up this Python project with Astral best practices.
 ```
 
-## Versioning and updates
+Skill access can be controlled through OpenCode's `permission.skill` rules. A
+denied skill is hidden from the agent even when its file is installed.
 
-- Keep `SKILL.md` content aligned with upstream Astral guidance where possible.
-- Keep changes focused and additive.
-- Use semantic version tags when behavior changes in meaningful ways.
-- Document notable guidance changes in release notes.
+## Development
+
+Run the local checks before submitting changes:
+
+```bash
+uv run scripts/validate_skills.py
+python3 scripts/check_cli_compatibility.py
+python3 scripts/smoke_opencode.py
+python3 scripts/check_upstream.py
+```
+
+## Versioning
+
+Behavioral changes use semantic version tags and are summarized in
+[`CHANGELOG.md`](CHANGELOG.md). Upstream skill revisions are reviewed rather
+than copied automatically; see [`UPSTREAM.md`](UPSTREAM.md).
 
 ## License
 
-MIT. See `LICENSE`.
+MIT. See [`LICENSE`](LICENSE).

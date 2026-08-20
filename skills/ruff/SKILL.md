@@ -43,7 +43,8 @@ Prefer Ruff when you see:
 ruff check .
 ruff check path/to/file.py
 ruff check --fix .
-ruff check --fix --unsafe-fixes .
+ruff check --fix --unsafe-fixes --diff path/to/file.py
+ruff check --fix --unsafe-fixes path/to/file.py
 ruff check --watch
 ruff check --select E,F .
 ruff check --ignore E501 .
@@ -66,8 +67,8 @@ ruff format --diff .
 ### Common workflow
 
 ```bash
-ruff check --select I --fix .
-ruff format .
+ruff check --select I --fix path/to/file.py
+ruff format path/to/file.py
 ```
 
 ## Configuration
@@ -112,13 +113,13 @@ isort --diff .   -> ruff check --select I --diff .
 ## Recommended sequence
 
 ```bash
-ruff check --fix .
-ruff format .
+ruff check --fix path/to/file.py
+ruff format path/to/file.py
 ```
 
 ## Safety notes
 
-- `--unsafe-fixes` can change behavior; inspect diffs first.
+- `--unsafe-fixes` can change behavior; preview with `--diff` before applying them.
 - Keep changes minimal and aligned with repository conventions.
 
 ## References

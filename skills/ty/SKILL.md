@@ -36,7 +36,7 @@ ty check
 ty check path/to/file.py
 ty check src/
 ty check --watch
-ty check --output-format json
+ty check --output-format concise
 ```
 
 ### Rule controls
@@ -117,18 +117,15 @@ pyright path/to/file.py -> ty check path/to/file.py
 
 ```python
 x = undefined_var  # ty: ignore[possibly-unresolved-reference]
-
-# file-level suppression
-# ty: ignore-file[unresolved-import]
 ```
 
-## Language server
+For a file-level suppression, place the rule-specific comment before any Python
+code:
 
-`ty` can run as a language server:
+```python
+# ty: ignore[unresolved-import]
 
-```bash
-ty server
-ty server --python-version 3.12
+from optional_dependency import feature
 ```
 
 ## References
